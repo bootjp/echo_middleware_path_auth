@@ -1,0 +1,1 @@
+# echo_middleware_path_auth
