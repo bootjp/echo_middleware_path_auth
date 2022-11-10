@@ -79,14 +79,31 @@ func TestPathAuthWithConfig(t *testing.T) {
 		expectError         string
 	}{
 		{
-			name: "ok, default config",
+			name: "ok success",
 			givenRequestFunc: func() *http.Request {
-				req := httptest.NewRequest(http.MethodPost, "/valid-key", nil)
-				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+				req := httptest.NewRequest(http.MethodGet, "/valid-key", nil)
 				return req
 			},
 			expectHandlerCalled: true,
 			expectError:         "",
+		},
+		{
+			name: "ng user error",
+			givenRequestFunc: func() *http.Request {
+				req := httptest.NewRequest(http.MethodGet, "/error-key", nil)
+				return req
+			},
+			expectHandlerCalled: false,
+			expectError:         "code=401, message=Unauthorized, internal=some user defined error",
+		},
+		{
+			name: "ng no valid no error",
+			givenRequestFunc: func() *http.Request {
+				req := httptest.NewRequest(http.MethodGet, "/bad", nil)
+				return req
+			},
+			expectHandlerCalled: false,
+			expectError:         "code=400, message=Bad Request",
 		},
 	}
 
@@ -117,7 +134,8 @@ func TestPathAuthWithConfig(t *testing.T) {
 			e.GET("/:apikey", middlewareChain)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			e.Router().Find(http.MethodGet, "/valid-key", c)
+			// use params
+			e.Router().Find(http.MethodGet, req.URL.Path, c)
 			err := middlewareChain(c)
 
 			assert.Equal(t, tc.expectHandlerCalled, handlerCalled)
