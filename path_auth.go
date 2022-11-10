@@ -16,18 +16,11 @@ type (
 		// Required.
 		Validator PathAuthValidator
 
-		// ErrorHandler defines a function which is executed for an invalid key.
-		// It may be used to define a custom error.
-		ErrorHandler PathAuthErrorHandler
-
 		Param string
 	}
 
 	// PathAuthValidator defines a function to validate PathAuth credentials.
 	PathAuthValidator func(auth string, c echo.Context) (bool, error)
-
-	// PathAuthErrorHandler defines a function which is executed for an invalid key.
-	PathAuthErrorHandler func(err error, c echo.Context) error
 )
 
 var (
@@ -94,7 +87,7 @@ func PathAuthWithConfig(config PathAuthConfig) echo.MiddlewareFunc {
 				return next(c)
 			}
 
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			return echo.NewHTTPError(http.StatusBadRequest)
 		}
 	}
 }
