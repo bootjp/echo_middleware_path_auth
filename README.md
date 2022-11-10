@@ -4,6 +4,7 @@
 middleware for path-based authentication of labstack echo. Best when using apikey for path.
 
 
+Much of this code is based on [key_auth.go in labstack/echo and its test code](https://github.com/labstack/echo/blob/01d7d01bbc1948cd308b2ae93a131654e6dba195/middleware/key_auth.go).
 
 ## Badges
 
