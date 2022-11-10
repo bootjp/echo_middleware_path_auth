@@ -65,7 +65,7 @@ func PathAuthWithConfig(config PathAuthConfig) echo.MiddlewareFunc {
 		panic("PathAuth: requires a validator function")
 	}
 
-	if len(config.Param) == 0 {
+	if config.Param == "" {
 		panic("PathAuth: requires a param")
 	}
 
