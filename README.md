@@ -33,7 +33,7 @@ func main() {
 
 	e := echo.New()
 	// group route
-	e.Group("/api", pa.PathAuth("apikey", func(auth string, c echo.Context) (bool, error) {
+	e.Group("/api/:apikey", pa.PathAuth("apikey", func(auth string, c echo.Context) (bool, error) {
 		// add your logic
 		return true, nil
 	}))
