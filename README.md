@@ -3,6 +3,10 @@
 
 middleware for path-based authentication of labstack echo. Best when using apikey for path.
 
+example) https://example.com/api/this_is_api_key
+This `this_is_api_key` part can be dynamically submitted to authentication.
+For example, whether apikey is active, RateLimit is not exceeded, etc.
+
 
 Much of this code is based on [key_auth.go in labstack/echo and its test code](https://github.com/labstack/echo/blob/01d7d01bbc1948cd308b2ae93a131654e6dba195/middleware/key_auth.go).
 
