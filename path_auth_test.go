@@ -237,3 +237,10 @@ func TestPathAuthWithConfig_panicsOnEmptyParam(t *testing.T) {
 		},
 	)
 }
+
+func TestExtract(t *testing.T) {
+
+	assert.True(t, extract("apikey", []string{"apikey", "valid-key"}))
+	assert.False(t, extract("apikey", []string{"valid-key"}))
+
+}
