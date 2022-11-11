@@ -26,6 +26,7 @@ func TestKeyAuth(t *testing.T) {
 		handlerCalled := false
 		handler := func(c echo.Context) error {
 			handlerCalled = true
+			//nolint:wrapcheck
 			return c.String(http.StatusOK, "test")
 		}
 		middlewareChain := PathAuth("apikey", testKeyValidator)(handler)
