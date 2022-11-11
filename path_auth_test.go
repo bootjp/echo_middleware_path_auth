@@ -63,9 +63,53 @@ func TestKeyAuth(t *testing.T) {
 		err := middlewareChain(c)
 
 		assert.Error(t, err)
+		assert.EqualError(t, err, "code=401, message=Unauthorized, internal=some user defined error")
 		assert.False(t, handlerCalled)
 	})
+	t.Run("auth no error failed", func(t *testing.T) {
+		handlerCalled := false
+		handler := func(c echo.Context) error {
+			handlerCalled = true
+			return c.String(http.StatusOK, "test")
+		}
+		middlewareChain := PathAuth("apikey", testKeyValidator)(handler)
 
+		e := echo.New()
+		e.GET("/:apikey", middlewareChain)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		e.Router().Find(http.MethodGet, "/no-error", c)
+		err := middlewareChain(c)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "code=401, message=Unauthorized")
+		assert.False(t, handlerCalled)
+	})
+	t.Run("auth nokey", func(t *testing.T) {
+		handlerCalled := false
+		handler := func(c echo.Context) error {
+			handlerCalled = true
+			return c.String(http.StatusOK, "test")
+		}
+		middlewareChain := PathAuth("undef", testKeyValidator)(handler)
+
+		e := echo.New()
+		e.GET("/:apikey", middlewareChain)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		e.Router().Find(http.MethodGet, "/error-key", c)
+		err := middlewareChain(c)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "code=400, message=Bad Request, internal=code=400, message=Missing key in the request")
+		assert.False(t, handlerCalled)
+	})
 }
 
 func TestPathAuthWithConfig(t *testing.T) {
@@ -103,7 +147,7 @@ func TestPathAuthWithConfig(t *testing.T) {
 				return req
 			},
 			expectHandlerCalled: false,
-			expectError:         "code=400, message=Bad Request",
+			expectError:         "code=401, message=Unauthorized",
 		},
 	}
 
