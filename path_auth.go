@@ -31,19 +31,7 @@ var (
 )
 
 // ErrKeyAuthMissing is error type when PathAuth middleware is unable to extract value from lookups
-type ErrKeyAuthMissing struct {
-	Err error
-}
-
-// Error returns errors text
-func (e *ErrKeyAuthMissing) Error() string {
-	return e.Err.Error()
-}
-
-// Unwrap unwraps error
-func (e *ErrKeyAuthMissing) Unwrap() error {
-	return e.Err
-}
+var ErrKeyAuthMissing = echo.NewHTTPError(http.StatusBadRequest, "Missing key in the request")
 
 // PathAuth returns an PathAuth middleware.
 //
@@ -74,20 +62,35 @@ func PathAuthWithConfig(config PathAuthConfig) echo.MiddlewareFunc {
 			if config.Skipper(c) {
 				return next(c)
 			}
-			valid, err := config.Validator(c.Param(config.Param), c)
-			if err != nil {
+
+			if !extract(config.Param, c.ParamNames()) {
 				return &echo.HTTPError{
-					Code:     http.StatusUnauthorized,
-					Message:  "Unauthorized",
-					Internal: err,
+					Code:     http.StatusBadRequest,
+					Message:  http.StatusText(http.StatusBadRequest),
+					Internal: ErrKeyAuthMissing,
 				}
 			}
 
-			if valid {
+			valid, err := config.Validator(c.Param(config.Param), c)
+			if err == nil && valid {
 				return next(c)
 			}
 
-			return echo.NewHTTPError(http.StatusBadRequest)
+			return &echo.HTTPError{
+				Code:     http.StatusUnauthorized,
+				Message:  http.StatusText(http.StatusUnauthorized),
+				Internal: err,
+			}
 		}
 	}
+}
+
+func extract(cParam string, params []string) bool {
+	for _, param := range params {
+		if cParam == param {
+			return true
+		}
+	}
+
+	return false
 }

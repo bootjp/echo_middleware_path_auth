@@ -26,6 +26,7 @@ func TestKeyAuth(t *testing.T) {
 		handlerCalled := false
 		handler := func(c echo.Context) error {
 			handlerCalled = true
+			//nolint:wrapcheck
 			return c.String(http.StatusOK, "test")
 		}
 		middlewareChain := PathAuth("apikey", testKeyValidator)(handler)
@@ -48,6 +49,7 @@ func TestKeyAuth(t *testing.T) {
 		handlerCalled := false
 		handler := func(c echo.Context) error {
 			handlerCalled = true
+			//nolint:wrapcheck
 			return c.String(http.StatusOK, "test")
 		}
 		middlewareChain := PathAuth("apikey", testKeyValidator)(handler)
@@ -63,9 +65,55 @@ func TestKeyAuth(t *testing.T) {
 		err := middlewareChain(c)
 
 		assert.Error(t, err)
+		assert.EqualError(t, err, "code=401, message=Unauthorized, internal=some user defined error")
 		assert.False(t, handlerCalled)
 	})
+	t.Run("auth no error failed", func(t *testing.T) {
+		handlerCalled := false
+		handler := func(c echo.Context) error {
+			handlerCalled = true
+			//nolint:wrapcheck
+			return c.String(http.StatusOK, "test")
+		}
+		middlewareChain := PathAuth("apikey", testKeyValidator)(handler)
 
+		e := echo.New()
+		e.GET("/:apikey", middlewareChain)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		e.Router().Find(http.MethodGet, "/no-error", c)
+		err := middlewareChain(c)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "code=401, message=Unauthorized")
+		assert.False(t, handlerCalled)
+	})
+	t.Run("auth nokey", func(t *testing.T) {
+		handlerCalled := false
+		handler := func(c echo.Context) error {
+			handlerCalled = true
+			//nolint:wrapcheck
+			return c.String(http.StatusOK, "test")
+		}
+		middlewareChain := PathAuth("undef", testKeyValidator)(handler)
+
+		e := echo.New()
+		e.GET("/:apikey", middlewareChain)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		e.Router().Find(http.MethodGet, "/error-key", c)
+		err := middlewareChain(c)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "code=400, message=Bad Request, internal=code=400, message=Missing key in the request")
+		assert.False(t, handlerCalled)
+	})
 }
 
 func TestPathAuthWithConfig(t *testing.T) {
@@ -103,7 +151,7 @@ func TestPathAuthWithConfig(t *testing.T) {
 				return req
 			},
 			expectHandlerCalled: false,
-			expectError:         "code=400, message=Bad Request",
+			expectError:         "code=401, message=Unauthorized",
 		},
 	}
 
@@ -112,6 +160,7 @@ func TestPathAuthWithConfig(t *testing.T) {
 			handlerCalled := false
 			handler := func(c echo.Context) error {
 				handlerCalled = true
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			config := PathAuthConfig{
@@ -154,6 +203,7 @@ func TestPathAuthWithConfig_panicsOnEmptyValidator(t *testing.T) {
 		"PathAuth: requires a validator function",
 		func() {
 			handler := func(c echo.Context) error {
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			PathAuthWithConfig(PathAuthConfig{
@@ -169,6 +219,7 @@ func TestPathAuthWithConfig_panicsOnEmptyParam(t *testing.T) {
 		"PathAuth: requires a param",
 		func() {
 			handler := func(c echo.Context) error {
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			PathAuthWithConfig(PathAuthConfig{
@@ -185,6 +236,7 @@ func TestPathAuthWithConfig_panicsOnEmptyParam(t *testing.T) {
 		"PathAuth: requires a param",
 		func() {
 			handler := func(c echo.Context) error {
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			PathAuth("", func(auth string, c echo.Context) (bool, error) {
@@ -192,4 +244,11 @@ func TestPathAuthWithConfig_panicsOnEmptyParam(t *testing.T) {
 			})(handler)
 		},
 	)
+}
+
+func TestExtract(t *testing.T) {
+
+	assert.True(t, extract("apikey", []string{"apikey", "valid-key"}))
+	assert.False(t, extract("apikey", []string{"valid-key"}))
+
 }
