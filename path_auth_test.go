@@ -49,6 +49,7 @@ func TestKeyAuth(t *testing.T) {
 		handlerCalled := false
 		handler := func(c echo.Context) error {
 			handlerCalled = true
+			//nolint:wrapcheck
 			return c.String(http.StatusOK, "test")
 		}
 		middlewareChain := PathAuth("apikey", testKeyValidator)(handler)
@@ -71,6 +72,7 @@ func TestKeyAuth(t *testing.T) {
 		handlerCalled := false
 		handler := func(c echo.Context) error {
 			handlerCalled = true
+			//nolint:wrapcheck
 			return c.String(http.StatusOK, "test")
 		}
 		middlewareChain := PathAuth("apikey", testKeyValidator)(handler)
@@ -93,6 +95,7 @@ func TestKeyAuth(t *testing.T) {
 		handlerCalled := false
 		handler := func(c echo.Context) error {
 			handlerCalled = true
+			//nolint:wrapcheck
 			return c.String(http.StatusOK, "test")
 		}
 		middlewareChain := PathAuth("undef", testKeyValidator)(handler)
@@ -157,6 +160,7 @@ func TestPathAuthWithConfig(t *testing.T) {
 			handlerCalled := false
 			handler := func(c echo.Context) error {
 				handlerCalled = true
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			config := PathAuthConfig{
@@ -199,6 +203,7 @@ func TestPathAuthWithConfig_panicsOnEmptyValidator(t *testing.T) {
 		"PathAuth: requires a validator function",
 		func() {
 			handler := func(c echo.Context) error {
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			PathAuthWithConfig(PathAuthConfig{
@@ -214,6 +219,7 @@ func TestPathAuthWithConfig_panicsOnEmptyParam(t *testing.T) {
 		"PathAuth: requires a param",
 		func() {
 			handler := func(c echo.Context) error {
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			PathAuthWithConfig(PathAuthConfig{
@@ -230,6 +236,7 @@ func TestPathAuthWithConfig_panicsOnEmptyParam(t *testing.T) {
 		"PathAuth: requires a param",
 		func() {
 			handler := func(c echo.Context) error {
+				//nolint:wrapcheck
 				return c.String(http.StatusOK, "test")
 			}
 			PathAuth("", func(auth string, c echo.Context) (bool, error) {
