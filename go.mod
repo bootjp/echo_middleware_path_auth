@@ -3,7 +3,7 @@ module github.com/bootjp/echo_middleware_path_auth
 go 1.19
 
 require (
-	github.com/labstack/echo/v4 v4.10.1
+	github.com/labstack/echo/v4 v4.10.2
 	github.com/stretchr/testify v1.8.1
 )
 
