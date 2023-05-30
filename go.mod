@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/labstack/echo/v4 v4.10.2
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 )
 
 require (
