@@ -12,7 +12,7 @@ linters:
     - gocritic
     - gocyclo
     - gofmt
-    - gomnd
+    - mnd
     - gosec
     - lll
     - makezero
