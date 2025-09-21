@@ -6,7 +6,7 @@ toolchain go1.25.1
 
 require (
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
