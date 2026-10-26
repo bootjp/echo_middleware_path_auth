@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: actions/setup-go@v3
         with:
-          go-version-file: "path/to/go.mod"
+          go-version-file: "go.mod"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: go test ./...
