@@ -19,3 +19,4 @@ jobs:
           golangci_lint_flags: "--config=.golangci.yaml"
           filter_mode: nofilter
           reporter: github-pr-review
+
