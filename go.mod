@@ -2,10 +2,8 @@ module github.com/bootjp/echo_middleware_path_auth
 
 go 1.27.3
 
-toolchain go1.26.5
-
 require (
-	github.com/labstack/echo/v4 v4.16.2
+	github.com/labstack/echo/v4 v4.16.3
 	github.com/stretchr/testify v1.12.1
 )
 
